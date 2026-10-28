@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #fcfcfd;
   --foreground: #171717;
+  --brand-purple: #560084;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-purple: #560084;
+  --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background-color: #fcfcfd;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
+
+/* Isometric 3D Box Styles matching Figma export */
+.iso-box-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.iso-face-top {
+  position: absolute;
+  background: linear-gradient(135deg, rgba(245, 225, 255, 0.95) 0%, rgba(195, 130, 245, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.iso-face-left {
+  position: absolute;
+  background: linear-gradient(180deg, rgba(225, 175, 255, 0.85) 0%, rgba(175, 105, 235, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset -20px 20px 40px rgba(110, 0, 169, 0.15);
+}
+
+.iso-face-right {
+  position: absolute;
+  background: linear-gradient(180deg, rgba(165, 75, 230, 0.9) 0%, rgba(125, 30, 195, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 20px 20px 40px rgba(70, 0, 110, 0.2);
+}
+
