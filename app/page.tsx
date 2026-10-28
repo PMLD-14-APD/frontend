@@ -11,14 +11,51 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Simulating frontend response before backend integration
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  };
+  
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (isLoading) return;
+
+  setIsLoading(true);
+  setError("");
+  setSuccess("");
+
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username.trim(),
+        password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Login gagal");
+    }
+
+    setSuccess(`Login berhasil! Selamat datang, ${data.user.name}.`);
+    setPassword("");
+
+    // Navigasi ke dashboard ditambahkan saat
+    // halaman dashboard sudah tersedia.
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Terjadi kesalahan saat login"
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+  const [error, setError] = useState("");
+const [success, setSuccess] = useState("");
 
   return (
     <div className="h-screen h-dvh w-full bg-[#FBFAFC] flex flex-col lg:flex-row relative overflow-hidden select-none">
@@ -41,10 +78,10 @@ export default function LoginPage() {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+            <form aria-busy={isLoading} onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               {/* Username Input */}
               <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-medium text-zinc-700 block">
+                <label htmlFor="username" className="text-xs sm:text-sm font-medium text-zinc-700 block">
                   Username
                 </label>
                 <div className="relative flex items-center">
@@ -52,6 +89,10 @@ export default function LoginPage() {
                     <User className="w-4 h-4" />
                   </div>
                   <input
+                    id="username"
+                    name="username"
+                    autoComplete="username"
+                    disabled={isLoading}
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
@@ -64,7 +105,7 @@ export default function LoginPage() {
 
               {/* Password Input */}
               <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-medium text-zinc-700 block">
+                <label htmlFor="password" className="text-xs sm:text-sm font-medium text-zinc-700 block">
                   Password
                 </label>
                 <div className="relative flex items-center">
@@ -72,6 +113,10 @@ export default function LoginPage() {
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
+                    id="password"
+                    name="password"
+                    autoComplete="current-password"
+                    disabled={isLoading}
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -93,6 +138,23 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
+              {error && (
+  <p
+    role="alert"
+    className="text-sm text-center text-red-600   "
+  >
+    {error}
+  </p>
+)}
+
+{success && (
+  <p
+    role="status"
+    className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3"
+  >
+    {success}
+  </p>
+)}
 
               {/* Submit Button */}
               <button
