@@ -23,7 +23,7 @@ const menuItems = [
   },
   {
     label: "Manajemen Lokasi",
-    href: "/dashboard/locations",
+    href: "/dashboard/location-management",
     icon: MapPin,
   },
   {
