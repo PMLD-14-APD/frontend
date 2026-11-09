@@ -9,6 +9,7 @@ import TextInput from "../ui/TextInput";
 import PasswordInput from "../ui/PasswordInput";
 import SelectInput from "../ui/SelectInput";
 import Button from "../ui/Button";
+import { validateCreateUser } from "@/lib/user-validation";
 
 export type UserRole = "admin" | "user";
 
@@ -17,6 +18,7 @@ export interface UserFormValues {
   username: string;
   role: UserRole;
   password: string;
+  confirm_password: string;
 }
 
 interface UserFormModalProps {
@@ -29,6 +31,7 @@ interface UserFormModalProps {
     role: UserRole;
   };
   onSubmit?: (values: UserFormValues) => Promise<void>;
+  roleLocked?: boolean;
 }
 
 export default function UserFormModal({
@@ -37,6 +40,7 @@ export default function UserFormModal({
   mode = "create",
   initialValues,
   onSubmit,
+  roleLocked = false,
 }: UserFormModalProps) {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -66,28 +70,12 @@ export default function UserFormModal({
 
     setError("");
 
-    if (name.trim().length < 1) {
-      setError("Nama lengkap wajib diisi.");
-      return;
-    }
-
-    if (username.trim().length < 3) {
-      setError("Username minimal 3 karakter.");
-      return;
-    }
-
-    if (mode === "create" && password.length < 8) {
-      setError("Password minimal 8 karakter.");
-      return;
-    }
-
-    if (password && password.length > 72) {
-      setError("Password maksimal 72 karakter.");
-      return;
-    }
-
-    if (password !== confirmation) {
-      setError("Konfirmasi password tidak sesuai.");
+    const validation = validateCreateUser(
+      { name, username, role, password, confirm_password: confirmation },
+      mode === "edit",
+    );
+    if (!validation.success) {
+      setError(validation.message);
       return;
     }
 
@@ -99,12 +87,7 @@ export default function UserFormModal({
     setIsLoading(true);
 
     try {
-      await onSubmit({
-        name: name.trim(),
-        username: username.trim(),
-        role,
-        password,
-      });
+      await onSubmit(validation.data);
 
       onClose();
     } catch (err) {
@@ -121,6 +104,7 @@ export default function UserFormModal({
   return (
     <Modal
       open={open}
+      closeDisabled={isLoading}
       onClose={() => {
         if (!isLoading) onClose();
       }}
@@ -143,6 +127,7 @@ export default function UserFormModal({
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isLoading}
+          maxLength={100}
           required
         />
 
@@ -154,6 +139,8 @@ export default function UserFormModal({
           onChange={(e) => setUsername(e.target.value)}
           disabled={isLoading}
           minLength={3}
+          maxLength={50}
+          pattern="[a-zA-Z0-9_.\-]+"
           required
         />
 
@@ -166,7 +153,7 @@ export default function UserFormModal({
             { value: "admin", label: "Admin" },
             { value: "user", label: "User" },
           ]}
-          disabled={isLoading}
+          disabled={isLoading || roleLocked}
           required
         />
 
