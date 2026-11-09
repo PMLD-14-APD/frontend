@@ -40,3 +40,18 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
+
+# Local tooling and generated files
+CLAUDE.md
+.claude/
+*_CONTEXT.*
+context/
+notes/
+*.prompt.md
+*.generated.md
+__pycache__/
+.pytest_cache/
+dist/
+
+# Allow the environment template
+!.env.example
