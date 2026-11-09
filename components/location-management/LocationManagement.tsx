@@ -9,7 +9,7 @@ import LocationTable from "./LocationTable";
 import LocationDialog, { type LocationDialogState } from "./LocationDialog";
 import type { LocationRow } from "@/type/location";
 
-export default function LocationManagement({ locations, initialError }: { locations: LocationRow[]; initialError: string | null }) {
+export default function LocationManagement({ locations, initialError, canEdit }: { locations: LocationRow[]; initialError: string | null; canEdit: boolean }) {
     const [search, setSearch] = useState("");
     const [dialog, setDialog] = useState<LocationDialogState | null>(null);
     const [isPending, startTransition] = useTransition();
@@ -23,7 +23,9 @@ export default function LocationManagement({ locations, initialError }: { locati
         <section className="space-y-7">
             <PageHeader
             title="Manajemen Lokasi"
-            description="Tambah dan perbarui daftar area kerja di seluruh titik operasional untuk penempatan kamera pengawas."
+            description={canEdit
+                ? "Tambah dan perbarui daftar area kerja di seluruh titik operasional untuk penempatan kamera pengawas."
+                : "Lihat daftar lokasi penempatan kamera pengawas."}
             />
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <SearchInput placeholder="Cari berdasarkan lokasi atau kamera..."
@@ -31,13 +33,13 @@ export default function LocationManagement({ locations, initialError }: { locati
                 value={search}
                 onChange={setSearch}
                 />
-                <Button
+                {canEdit && <Button
                     icon={<Plus size={16} />}
                     onClick={() => setDialog({ mode: "create" })}
                     disabled={isPending}
                 >
                     Tambah Lokasi
-                </Button>
+                </Button>}
             </div>
             {initialError ? (
                 <div role="alert" className="space-y-3 rounded-lg bg-red-50 p-4 text-sm text-red-600">
@@ -47,11 +49,11 @@ export default function LocationManagement({ locations, initialError }: { locati
                     </Button>
                 </div>
             ) : (
-                <LocationTable locations={filtered} searching={!!search.trim()} disabled={isPending}
+                <LocationTable locations={filtered} searching={!!search.trim()} disabled={isPending} canEdit={canEdit}
                     onEdit={(location) => setDialog({ mode: "edit", location })}
                     onDelete={(location) => setDialog({ mode: "delete", location })} />
             )}
-            {dialog && <LocationDialog key={dialog.mode === "create" ? "create" : `${dialog.mode}-${dialog.location.id}`}
+            {canEdit && dialog && <LocationDialog key={dialog.mode === "create" ? "create" : `${dialog.mode}-${dialog.location.id}`}
                 dialog={dialog} onClose={() => setDialog(null)} />}
         </section>
 

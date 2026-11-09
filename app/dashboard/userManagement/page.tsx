@@ -12,7 +12,7 @@ export default async function UserManagementPage() {
   }
 
   if (currentUser.role !== "admin") {
-    return <p role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-700">Manajemen Pengguna hanya dapat diakses oleh akun dengan peran Admin.</p>;
+    return <p role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-700">Manajemen Pengguna hanya dapat diakses oleh Super Admin.</p>;
   }
 
   let users: User[] = [];
