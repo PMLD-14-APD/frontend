@@ -10,6 +10,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-brand-purple: #560084;
+  --color-brand-secondary: #EBE8ED;
+  --color-on-primary: #FCF6FF;
+  --color-font-primary: #262626;
   --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
 }
 
