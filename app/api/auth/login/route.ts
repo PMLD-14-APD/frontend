@@ -1,5 +1,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendUrl } from "@/lib/backend";
 
 function backendMessage(data: unknown, fallback: string): string {
   if (data && typeof data === "object" && "detail" in data && typeof data.detail === "string") {
@@ -9,7 +10,7 @@ function backendMessage(data: unknown, fallback: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const API_URL = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
+  const API_URL = getBackendUrl();
   let payload;
   try {
     payload = await request.json();
