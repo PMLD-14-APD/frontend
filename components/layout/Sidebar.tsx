@@ -32,7 +32,7 @@ const menuItems = [
     icon: UsersRound,
   },
   {
-    label: "Riwayat Analisis",
+    label: "Riwayat Pelanggaran",
     href: "/dashboard/history",
     icon: History,
   },
