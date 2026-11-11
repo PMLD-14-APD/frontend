@@ -1,5 +1,24 @@
 # Frontend
 
+## Tes koneksi CCTV Naziri
+
+Super Admin dapat membuka tombol Tes Koneksi CCTV di Monitoring untuk mengakses
+`/dashboard/cctv-test`. Halaman ini memakai layanan Naziri melalui konfigurasi
+server `CCTV_API_URL`, dengan default `http://127.0.0.1:8001`.
+Login tetap memakai BE utama pada `API_URL`. Kedua server perlu aktif.
+
+Proxy FE menyediakan `GET/POST /api/cctv/cameras` serta
+`POST /api/cctv/cameras/{id}/start` dan `/stop`. Daftar kamera digabung
+dengan hasil `GET /cameras/status/live` dari layanan Naziri. Kamera baru
+didaftarkan sebagai inactive dan dimulai lewat tombol Mulai Stream.
+Gunakan ID environment dari database layanan Naziri.
+
+Akses dibatasi ke Super Admin karena layanan Naziri belum menyediakan
+autentikasi atau pembatasan kepemilikan kamera. FE menghapus URL stream dari
+respons daftar dan tidak meneruskan token BE utama ke layanan Naziri.
+Halaman tes menampilkan status koneksi. Deteksi APD dan hasil analisis tetap
+menggunakan integrasi BE utama yang membutuhkan model aktif.
+
 ## Monitoring dan analisis
 
 `/dashboard` menampilkan sumber pemantauan, pencarian nama/lokasi, filter lokasi,
