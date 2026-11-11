@@ -10,6 +10,7 @@ import PasswordInput from "../ui/PasswordInput";
 import SelectInput from "../ui/SelectInput";
 import Button from "../ui/Button";
 import { validateCreateUser } from "@/lib/user-validation";
+import { USER_ROLE_LABELS } from "@/type/user";
 
 export type UserRole = "admin" | "user";
 
@@ -150,8 +151,8 @@ export default function UserFormModal({
           value={role}
           onChange={(e) => setRole(e.target.value as UserRole)}
           options={[
-            { value: "admin", label: "Admin" },
-            { value: "user", label: "User" },
+            { value: "admin", label: USER_ROLE_LABELS.admin },
+            { value: "user", label: USER_ROLE_LABELS.user },
           ]}
           disabled={isLoading || roleLocked}
           required

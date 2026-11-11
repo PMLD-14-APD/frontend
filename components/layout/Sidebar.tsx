@@ -30,6 +30,7 @@ const menuItems = [
     label: "Manajemen User",
     href: "/dashboard/userManagement",
     icon: UsersRound,
+    requiresUserManagement: true,
   },
   {
     label: "Riwayat Pelanggaran",
@@ -38,7 +39,7 @@ const menuItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ canManageUsers }: { canManageUsers: boolean }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -101,7 +102,7 @@ export default function Sidebar() {
           aria-label="Navigasi dashboard"
           className="flex-1 space-y-2 px-5 pt-5"
         >
-          {menuItems.map((item) => {
+          {menuItems.filter((item) => !item.requiresUserManagement || canManageUsers).map((item) => {
             const Icon = item.icon;
 
             const isActive =

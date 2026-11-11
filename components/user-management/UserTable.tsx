@@ -1,6 +1,7 @@
 "use client";
 
 import type { User } from "@/type/user";
+import { USER_ROLE_LABELS } from "@/type/user";
 import DataTable, { type DataTableColumn } from "../ui/DataTable";
 import { Pencil, Trash2 } from "lucide-react";
 interface UserTableProps {
@@ -32,7 +33,7 @@ export default function UserTable({ users, onEdit, onDelete, currentUserId, disa
       header: "Peran",
       className: "px-5 py-4",
       headerClassName: "px-5 py-4",
-      render: (user) => (user.role === "admin" ? "Admin" : "User"),
+      render: (user) => USER_ROLE_LABELS[user.role],
     },
     {
       key: "actions",
