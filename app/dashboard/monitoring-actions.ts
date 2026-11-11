@@ -22,7 +22,9 @@ export async function addCamera(input: unknown): Promise<Result> {
   try {
     await backendRequest("/video-sources/", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, stream_url: url, location_id: data.locationId, environment_id: data.environmentId }) });
-  } catch { return { success: false, message: "Kamera gagal ditambahkan. Periksa data, koneksi backend, dan akses akun Anda." }; }
+  } catch (error) {
+    return failure(error);
+  }
   refresh(); return { success: true };
 }
 

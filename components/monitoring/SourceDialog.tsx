@@ -81,6 +81,7 @@ export default function SourceDialog({ locations, environments, onClose }: { loc
         )}
         {(!locations.length || !environments.length) && <p role="status" className="text-xs text-zinc-500">Lokasi dan jenis area harus tersedia terlebih dahulu. Hubungi admin untuk melengkapinya.</p>}
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+        {pending && mode === "camera" && <p role="status" className="text-xs text-zinc-500">Memeriksa koneksi kamera. Pastikan kamera aktif dan dapat dijangkau dari server.</p>}
         {pending && mode === "upload" && <p role="status" className="text-xs text-zinc-500">Mengunggah dan memeriksa video. Tunggu hingga selesai.</p>}
         <div className="flex justify-end gap-4 pt-2">
           <button type="button" disabled={pending} onClick={onClose} className="text-sm text-[#4D0077]">Batal</button>

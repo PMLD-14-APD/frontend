@@ -3,7 +3,7 @@ import MonitoringClient from "@/components/monitoring/MonitoringClient";
 import { getMonitoring } from "@/lib/monitoring";
 import { BackendError } from "@/lib/backend";
 import type { MonitoringData } from "@/type/monitoring";
-import Link from "next/link";
+// import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 
 export default async function DashboardPage() {
@@ -18,13 +18,13 @@ export default async function DashboardPage() {
   }
   return (
     <>
-      {user.role === "admin" && (
+      {/* {user.role === "admin" && (
         <div className="mb-5 flex justify-end">
           <Link href="/dashboard/cctv-test" className="rounded-lg bg-[#EEEAF0] px-4 py-2 text-sm text-[#4D0077]">
             Tes Koneksi CCTV
           </Link>
         </div>
-      )}
+      )} */}
       <MonitoringClient data={data} error={error} />
     </>
   );
