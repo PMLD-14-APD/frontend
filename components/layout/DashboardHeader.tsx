@@ -1,5 +1,6 @@
 
 import { CircleUserRound } from "lucide-react";
+import { USER_ROLE_LABELS } from "@/type/user";
 import type { AuthUser } from "../../lib/auth";
 
 type DashboardHeaderProps = {
@@ -9,8 +10,7 @@ type DashboardHeaderProps = {
 export default function DashboardHeader({
   user,
 }: DashboardHeaderProps) {
-  const roleLabel =
-    user.role === "admin" ? "Super Admin" : "User";
+  const roleLabel = user.role === "admin" || user.role === "user" ? USER_ROLE_LABELS[user.role] : user.role;
 
   return (
     <header className="flex h-20 shrink-0 items-center justify-end border-b border-zinc-100 bg-white px-6 pl-16 sm:px-8 lg:px-10">
