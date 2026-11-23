@@ -1,10 +1,9 @@
-import Form from "next/form";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarDays, Search } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import EvidenceButton from "@/components/monitoring/EvidenceButton";
+import HistoryFilters from "@/components/history/HistoryFilters";
 import { backendRequest, BackendError } from "@/lib/backend";
 import { readBackendList } from "@/lib/backend-list";
 import { validId } from "@/lib/monitoring-validation";
@@ -24,7 +23,6 @@ type Query = Record<string, string | string[] | undefined>;
 
 const path = "/dashboard/history";
 const limit = 20;
-const field = "w-full rounded-lg border border-zinc-100 bg-white px-3 py-2.5 text-sm text-zinc-700";
 const dateFormat = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeZone: "Asia/Jakarta" });
 const timeFormat = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Jakarta" });
 
@@ -93,36 +91,9 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
   return (
     <section className="space-y-6">
       <PageHeader title="Daftar Pelanggaran APD" description="Daftar log pelanggaran keselamatan kerja yang terdeteksi secara otomatis oleh sistem kamera pemantau" />
-      <Form action={path} key={filters.toString()} className="flex flex-wrap items-start gap-3">
-        <label className="relative min-w-48 flex-1">
-          <Search size={16} className="pointer-events-none absolute left-3 top-3 text-zinc-400" />
-          <input name="search" defaultValue={search} maxLength={100} aria-label="Cari lokasi atau kamera" placeholder="Cari lokasi atau kamera..." className={`${field} pl-9`} />
-        </label>
-        <details className="relative">
-          <summary className={`${field} flex cursor-pointer list-none items-center gap-2`}>
-            {from || to ? `${from || "Awal"} – ${to || "Akhir"}` : "Rentang Tanggal"} <CalendarDays size={16} />
-          </summary>
-          <div className="absolute left-0 z-10 mt-2 grid w-60 gap-2 rounded-xl border border-zinc-100 bg-white p-4 text-sm shadow-lg">
-            <label>Dari tanggal<input type="date" name="date_from" defaultValue={from} className={field} /></label>
-            <label>Sampai tanggal<input type="date" name="date_to" defaultValue={to} className={field} /></label>
-            <button type="submit" className="rounded-lg bg-[#4D0077] px-3 py-2 text-white">Terapkan tanggal</button>
-          </div>
-        </details>
-        <select name="location_id" aria-label="Lokasi" defaultValue={location} className={`${field} w-auto max-w-48`}>
-          <option value="">Semua Lokasi</option>
-          {locations.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select>
-        <select name="source_id" aria-label="Kamera" defaultValue={source} className={`${field} w-auto max-w-48`}>
-          <option value="">Semua Kamera</option>
-          {cameras.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select>
-        <select name="apd_class_id" aria-label="Jenis APD yang tidak dipakai" defaultValue={apdClass} className={`${field} w-auto max-w-44`}>
-          <option value="">Semua Jenis APD</option>
-          {classes.map((item) => <option key={item.id} value={item.id}>Tanpa {item.name}</option>)}
-        </select>
-        <button type="submit" className="rounded-lg bg-[#4D0077] px-4 py-2.5 text-sm text-white">Terapkan</button>
-        {filtered && <Link href={path} className="px-2 py-2.5 text-sm text-[#4D0077]">Reset</Link>}
-      </Form>
+      <HistoryFilters path={path} locations={locations} cameras={cameras} classes={classes}
+        initial={{ search, location_id: validId(location) ? location : "", source_id: validId(source) ? source : "",
+          apd_class_id: validId(apdClass) ? apdClass : "", date_from: from, date_to: to }} />
       {error ? <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p> : (
         <DataTable items={data.items} getRowKey={(item) => String(item.id)} headerClassName="bg-[#EEEAF0]"
           emptyState={{
