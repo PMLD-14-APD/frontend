@@ -1,20 +1,21 @@
 import { notFound, redirect } from "next/navigation";
 import { BackendError } from "@/lib/backend";
-import { getAnalysis } from "@/lib/monitoring";
+import { getAnalysis, getLocationOptions } from "@/lib/monitoring";
 import { validId } from "@/lib/monitoring-validation";
 import AnalysisClient from "@/components/monitoring/AnalysisClient";
-import type { AnalysisData } from "@/type/monitoring";
+import type { AnalysisData, Option } from "@/type/monitoring";
 
 export default async function AnalysisPage({ params }: { params: Promise<{ sourceId: string }> }) {
   const { sourceId } = await params;
   if (!validId(sourceId)) notFound();
   let data: AnalysisData | null = null;
   let error: string | null = null;
-  try { data = await getAnalysis(sourceId); }
+  let locations: Option[] = [];
+  try { [data, locations] = await Promise.all([getAnalysis(sourceId), getLocationOptions().catch(() => [])]); }
   catch (cause) {
     if (cause instanceof BackendError && cause.status === 401) redirect("/");
     if (cause instanceof BackendError && cause.status === 404) notFound();
     error = cause instanceof BackendError ? cause.message : "Gagal memuat analisis.";
   }
-  return <AnalysisClient key={sourceId} sourceId={sourceId} initialData={data} initialError={error} />;
+  return <AnalysisClient key={sourceId} sourceId={sourceId} initialData={data} initialError={error} locations={locations} />;
 }

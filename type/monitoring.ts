@@ -4,6 +4,8 @@ export interface SourceCard extends Option {
   locationName: string;
   sourceType: "cctv_stream" | "video_upload";
   status: string;
+  /** URL kamera (password disamarkan "***" oleh backend), null untuk video unggahan. */
+  streamUrl: string | null;
   /** Sesi analisis yang sedang berjalan (untuk tayangan langsung), null kalau tidak ada. */
   liveSessionId: string | null;
 }

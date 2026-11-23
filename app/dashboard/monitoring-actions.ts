@@ -26,6 +26,25 @@ export async function addCamera(input: unknown): Promise<Result> {
   refresh(); return { success: true };
 }
 
+export async function updateCamera(sourceId: unknown, input: unknown): Promise<Result> {
+  if (!await getCurrentUser()) return { success: false, message: "Silakan masuk kembali." };
+  if (!validId(sourceId) || !input || typeof input !== "object") return { success: false, message: "Data kamera tidak valid." };
+  const data = input as Record<string, unknown>;
+  const name = sourceName(data.name);
+  if (!name || !validId(data.locationId)) return { success: false, message: "Isi nama dan lokasi kamera." };
+  const body: Record<string, unknown> = { name, location_id: data.locationId };
+  if (data.url !== undefined) {                     // hanya dikirim kalau URL memang diubah
+    const url = cameraUrl(data.url);
+    if (!url) return { success: false, message: "Masukkan URL RTSP atau HTTP/HTTPS yang valid." };
+    body.stream_url = url;
+  }
+  try {
+    await backendRequest(`/video-sources/${sourceId}`, { method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(30000) });
+  } catch (error) { return failure(error); }
+  refresh(sourceId); return { success: true };
+}
+
 export async function removeSource(id: unknown): Promise<Result> {
   if (!await getCurrentUser()) return { success: false, message: "Silakan masuk kembali." };
   if (!validId(id)) return { success: false, message: "ID sumber tidak valid." };

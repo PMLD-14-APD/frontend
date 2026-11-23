@@ -2,14 +2,15 @@
 import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Maximize2, Video, X } from "lucide-react";
+import { ArrowLeft, Maximize2, Pencil, Video, X } from "lucide-react";
 import Button from "../ui/Button";
 import EmptyState from "../ui/EmptyState";
 import Modal from "../ui/Modal";
 import { LiveFeed } from "./LiveFeed";
+import EditSourceDialog from "./EditSourceDialog";
 import { controlAnalysis } from "@/app/dashboard/monitoring-actions";
 import { jakartaDay } from "@/lib/monitoring-validation";
-import type { AnalysisData, Detection } from "@/type/monitoring";
+import type { AnalysisData, Detection, Option } from "@/type/monitoring";
 
 const statusNames = { queued: "Siap dianalisis", processing: "Analisis berjalan", done: "Analisis selesai", failed: "Analisis gagal" };
 const timestamp = (value: string, dateOnly = false) => new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", ...(dateOnly ? { dateStyle: "medium" as const } : { timeStyle: "medium" as const }) }).format(new Date(value));
@@ -20,7 +21,7 @@ function EvidenceImage({ log, large = false }: { log: Detection; large?: boolean
   return <Image src={`/api/monitoring/evidence/${log.id}`} alt={`Dokumentasi pelanggaran: ${log.violation}`} width={1280} height={720} unoptimized onError={() => setFailed(true)} className={large ? "max-h-[75dvh] w-full object-contain" : "aspect-video w-full object-contain"} />;
 }
 
-export default function AnalysisClient({ sourceId, initialData, initialError }: { sourceId: string; initialData: AnalysisData | null; initialError: string | null }) {
+export default function AnalysisClient({ sourceId, initialData, initialError, locations = [] }: { sourceId: string; initialData: AnalysisData | null; initialError: string | null; locations?: Option[] }) {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState(initialError);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -28,6 +29,7 @@ export default function AnalysisClient({ sourceId, initialData, initialError }: 
   const [date, setDate] = useState("");
   const [expanded, setExpanded] = useState<Detection | null>(null);
   const [liveExpanded, setLiveExpanded] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -88,6 +90,7 @@ export default function AnalysisClient({ sourceId, initialData, initialError }: 
       <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-lg bg-[#EEEAF0] px-3 py-2 text-xs text-[#4D0077]"><ArrowLeft size={14} />Kembali</Link>
       <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h1 className="text-2xl font-semibold text-zinc-900">{data?.source.name ?? "Analisis Kepatuhan APD"}</h1><p className="mt-2 text-sm text-zinc-500">{data?.source.locationName} · Verifikasi keselamatan dan kelengkapan proteksi kerja.</p></div>
         <div className="flex gap-2"><Button size="sm" variant="secondary" disabled={loading || pending} onClick={() => setRefreshKey((value) => value + 1)}>Perbarui</Button>
+          {data && <Button size="sm" variant="secondary" icon={<Pencil size={13} />} disabled={pending} onClick={() => setEditing(true)} aria-label={`Ubah sumber ${data.source.name}`}>Ubah</Button>}
           {data && <Button size="sm" isLoading={pending} onClick={control}>{processing ? "Hentikan Analisis" : "Mulai Analisis"}</Button>}</div>
       </header>
       {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-600">{error}</p>}
@@ -125,6 +128,7 @@ export default function AnalysisClient({ sourceId, initialData, initialError }: 
         <LiveFeed sessionId={liveSessionId} className="max-h-[75dvh] w-full object-contain" fallback={<p role="status" className="p-8 text-center text-sm text-zinc-500">Tayangan langsung tidak tersedia. Analisis mungkin sudah selesai.</p>} />
         <button type="button" onClick={() => setLiveExpanded(false)} className="mt-4 inline-flex items-center gap-2 text-sm text-[#4D0077]"><X size={15} />Tutup</button>
       </Modal>}
+      {editing && data && <EditSourceDialog source={data.source} locations={locations} onClose={() => setEditing(false)} onSaved={() => setRefreshKey((value) => value + 1)} />}
       {expanded && <Modal open onClose={() => setExpanded(null)} title="Dokumentasi Pelanggaran" description={`${timestamp(expanded.detectedAt, true)}, ${timestamp(expanded.detectedAt)} WIB`} wide>
         <EvidenceImage key={expanded.id} log={expanded} large /><button type="button" onClick={() => setExpanded(null)} className="mt-4 inline-flex items-center gap-2 text-sm text-[#4D0077]"><X size={15} />Tutup</button>
       </Modal>}

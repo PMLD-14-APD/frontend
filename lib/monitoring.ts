@@ -20,6 +20,7 @@ function sourceCard(item: Record<string, unknown>, locationName: string): Source
   if (!["cctv_stream", "video_upload"].includes(String(item.source_type))) throw new BackendError("Jenis sumber tidak valid.", 502);
   return { id: text(item.id), name: text(item.name), locationId: item.location_id === null ? null : text(item.location_id),
     locationName, sourceType: item.source_type as SourceCard["sourceType"], status: text(item.status),
+    streamUrl: typeof item.stream_url === "string" ? item.stream_url : null,
     liveSessionId: typeof item.active_session_id === "string" && validId(item.active_session_id) ? item.active_session_id : null };
 }
 
@@ -33,6 +34,10 @@ export async function getMonitoring(): Promise<MonitoringData> {
     locations: options,
     environments: rows(environments).map((item) => ({ id: text(item.id), name: text(item.name) })),
   };
+}
+
+export async function getLocationOptions(): Promise<{ id: string; name: string }[]> {
+  return rows(await backendRequest("/locations/")).map((item) => ({ id: text(item.id), name: text(item.name) }));
 }
 
 export async function latestSession(sourceId: string): Promise<Record<string, unknown> | undefined> {
